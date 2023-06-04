@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class SpriteBrowser : EditorWindow
 {
@@ -89,8 +90,6 @@ public class SpriteBrowser : EditorWindow
         }
     }
 
-
-
     private void ListSprites()
     {
         using (new EditorGUILayout.HorizontalScope(GUI.skin.box))
@@ -122,7 +121,14 @@ public class SpriteBrowser : EditorWindow
 
                 var texRect = GUILayoutUtility.GetRect(new GUIContent(texture), GUI.skin.box, GUILayout.Width(128), GUILayout.Height(128));
                 GUI.Box(texRect, texture, GUI.skin.box);
-                GUILayout.Label(assetPath);
+                using (new EditorGUILayout.VerticalScope())
+                {
+                    GUILayout.Label(assetPath);
+                    if (GUILayout.Button("select ref gameObjects", GUILayout.MaxWidth(200)))
+                    {
+                        SelectRefGameObjecs(data);
+                    }
+                }
                 EditorGUILayout.Space();
                 EditorGUI.BeginChangeCheck();
                 data.repalceTex = (Texture)EditorGUILayout.ObjectField(data.repalceTex, typeof(Texture), true, GUILayout.Width(128), GUILayout.Height(128));
@@ -160,6 +166,13 @@ public class SpriteBrowser : EditorWindow
                 }
             }
         }
+    }
+
+    private void SelectRefGameObjecs(LineData data)
+    {
+        if (data == null)
+            return;
+        Selection.objects = data.refImages.Select(x => x.gameObject).ToArray();
     }
 
     [Serializable]
